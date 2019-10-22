@@ -1,18 +1,30 @@
 import React from "react";
 import './App.sass';
 import StorageOption from "./components/StorageOption/StorageOption";
+import CreateUserForm from "./components/CreateUserForm/CreateUserForm";
+import UserTable from "./components/UserTable/UserTable";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.hideMessege = this.hideMessege.bind(this);
+    this.handleStorageOptionClick = this.handleStorageOptionClick.bind(this);
+    this.handleButtonCreateClick = this.handleButtonCreateClick.bind(this);
+    this.handleCreateUserFormSubmit = this.handleCreateUserFormSubmit.bind(this);
     this.state = {
       users: null,
       isSuccessfully: false,
+      isCreating: false,
     };
   }
 
-  handleButtonClick(target) {
+  hideMessege() {
+    setTimeout(() => this.setState({
+      isSuccessfully: false,
+    }), 3000);
+  }
+
+  handleStorageOptionClick(target) {
     if (target.tagName !== "BUTTON") return;
 
     if (!localStorage.users) localStorage.users = JSON.stringify([]);
@@ -25,9 +37,7 @@ class App extends React.Component {
       isSuccessfully: true,
     }), 200);
 
-    setTimeout(() => this.setState({
-      isSuccessfully: false,
-    }), 3000);
+    this.hideMessege();
 
     /*for (let i = 0; i <= 3; i++) {
       const storage = JSON.parse(this.state.storage);
@@ -37,8 +47,30 @@ class App extends React.Component {
     }*/
   }
 
+  handleButtonCreateClick(e) {
+    e.preventDefault();
+    this.setState({isCreating: true});
+  }
+
+  handleCreateUserFormSubmit(target) {
+    const users = this.state.users;
+
+    users.push({
+      id: users.length,
+      name: target.name.value,
+    });
+
+    console.log(users);
+    setTimeout(() => this.setState({
+      isCreating: false,
+      isSuccessfully: true,
+    }), 200);
+
+    this.hideMessege();
+  }
+
   render() {
-    const {users, isSuccessfully} = this.state;
+    const {users, isSuccessfully, isCreating} = this.state;
 
     return (
       <div className="app-wrapper">
@@ -56,7 +88,11 @@ class App extends React.Component {
                         <span className="mui-caret"></span>
                       </button>
                       <ul className="mui-dropdown__menu header__list">
-                        <li><a href="/">Create</a></li>
+                        <li>
+                          <a href="/" onClick={this.handleButtonCreateClick}>
+                            Create
+                          </a>
+                        </li>
                         {(users && users.length > 0) &&
                           <li><a href="/">Read</a></li>
                         }
@@ -72,7 +108,13 @@ class App extends React.Component {
         <div className="mui--text-center content-wrapper">
           <div className="mui--appbar-height"></div>
           {!users &&
-            <StorageOption onButtonClick={this.handleButtonClick}/>
+            <StorageOption onClick={this.handleStorageOptionClick} />
+          }
+          {isCreating &&
+            <CreateUserForm onSubmit={this.handleCreateUserFormSubmit} />
+          }
+          {(users && users.length > 0) &&
+            <UserTable users={users}/>
           }
           <p
             className={isSuccessfully ? "mui--z2 alert-success alert-success_visible" : "mui--z2 alert-success"}

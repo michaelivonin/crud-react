@@ -8,15 +8,15 @@ class StorageOption extends React.Component {
   }
 
   handleClick(e) {
-    this.props.onButtonClick(e.target);
+    this.props.onClick(e.target);
   }
 
   render() {
     return (
-      <div className="storage-option">
+      <div className="storage-option mui--text-center">
         <br/>
         <br/>
-        <div className="mui--text-display3">Choose storage</div>
+        <div className="mui--text-display2">Choose storage</div>
         <br/>
         <br/>
         <div onClick={this.handleClick}>
