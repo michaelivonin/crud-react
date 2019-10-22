@@ -1,8 +1,8 @@
 import React from "react";
-import './App.sass';
 import StorageOption from "./components/StorageOption/StorageOption";
-import CreateUserForm from "./components/CreateUserForm/CreateUserForm";
+import UserForm from "./components/UserForm/UserForm";
 import UserTable from "./components/UserTable/UserTable";
+import './App.sass';
 
 class App extends React.Component {
   constructor(props) {
@@ -10,11 +10,19 @@ class App extends React.Component {
     this.hideMessege = this.hideMessege.bind(this);
     this.handleStorageOptionClick = this.handleStorageOptionClick.bind(this);
     this.handleButtonCreateClick = this.handleButtonCreateClick.bind(this);
-    this.handleCreateUserFormSubmit = this.handleCreateUserFormSubmit.bind(this);
+    this.handleUserFormCreateSubmit = this.handleUserFormCreateSubmit.bind(this);
+    this.handleButtonReadClick = this.handleButtonReadClick.bind(this);
+    this.handleUserFormReadSubmit = this.handleUserFormReadSubmit.bind(this);
+    this.handleUserTableUpdateClick = this.handleUserTableUpdateClick.bind(this);
+    this.handleUserFormUpdateSubmit = this.handleUserFormUpdateSubmit.bind(this);
+    this.handleUserTableDeleteClick = this.handleUserTableDeleteClick.bind(this);
     this.state = {
       users: null,
       isSuccessfully: false,
       isCreating: false,
+      isReading: false,
+      userFound: null,
+      userUpdating: false,
     };
   }
 
@@ -49,18 +57,22 @@ class App extends React.Component {
 
   handleButtonCreateClick(e) {
     e.preventDefault();
-    this.setState({isCreating: true});
+    this.setState({
+      isCreating: true,
+      isReading: false,
+      userFound: null,
+      userUpdating: null,
+    });
   }
 
-  handleCreateUserFormSubmit(target) {
+  handleUserFormCreateSubmit(target) {
     const users = this.state.users;
 
     users.push({
-      id: users.length,
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
       name: target.name.value,
     });
 
-    console.log(users);
     setTimeout(() => this.setState({
       isCreating: false,
       isSuccessfully: true,
@@ -69,8 +81,52 @@ class App extends React.Component {
     this.hideMessege();
   }
 
+  handleButtonReadClick(e) {
+    e.preventDefault();
+    this.setState({
+      isReading: true,
+      isCreating: false,
+      userFound: null,
+      userUpdating: null,
+    });
+  }
+
+  handleUserFormReadSubmit(target) {
+    const user = this.state.users.find(user => user.name === target.name.value);
+
+    setTimeout(() => this.setState({
+      userFound: user,
+      isReading: false,
+    }), 200);
+  }
+
+  handleUserTableUpdateClick(id) {
+    this.setState({
+      userFound: null,
+      userUpdating: this.state.users.find(user => user.id === id)
+    });
+  }
+
+  handleUserFormUpdateSubmit() {
+
+  }
+
+  handleUserTableDeleteClick(id) {
+    const accept = window.confirm("Are you sure you want to delete this user?");
+    if (!accept) return;
+
+    const users = this.state.users.filter(user => user.id !== id);
+    setTimeout(() => this.setState({
+      users: users,
+      userFound: null,
+      isSuccessfully: true,
+    }), 200);
+
+    this.hideMessege();
+  }
+
   render() {
-    const {users, isSuccessfully, isCreating} = this.state;
+    const {users, isSuccessfully, isCreating, isReading, userFound, userUpdating} = this.state;
 
     return (
       <div className="app-wrapper">
@@ -94,7 +150,11 @@ class App extends React.Component {
                           </a>
                         </li>
                         {(users && users.length > 0) &&
-                          <li><a href="/">Read</a></li>
+                          <li>
+                            <a href="/" onClick={this.handleButtonReadClick}>
+                              Read
+                            </a>
+                          </li>
                         }
                       </ul>
                     </div>
@@ -105,16 +165,35 @@ class App extends React.Component {
             </table>
           </div>
         </header>
-        <div className="mui--text-center content-wrapper">
+        <div className="content-wrapper">
           <div className="mui--appbar-height"></div>
           {!users &&
             <StorageOption onClick={this.handleStorageOptionClick} />
           }
           {isCreating &&
-            <CreateUserForm onSubmit={this.handleCreateUserFormSubmit} />
+            <UserForm
+              isCreating={isCreating}
+              onCreateSubmit={this.handleUserFormCreateSubmit}
+            />
           }
-          {(users && users.length > 0) &&
-            <UserTable users={users}/>
+          {isReading &&
+            <UserForm
+              isReading={isReading}
+              onReadSubmit={this.handleUserFormReadSubmit}
+            />
+          }
+          {userFound &&
+            <UserTable
+              user={userFound}
+              onUpdateClick={this.handleUserTableUpdateClick}
+              onDeleteClick={this.handleUserTableDeleteClick}
+            />
+          }
+          {userUpdating &&
+            <UserForm
+              userUpdating={userUpdating}
+              onUpdateSubmit={this.handleUserFormUpdateSubmit}
+            />
           }
           <p
             className={isSuccessfully ? "mui--z2 alert-success alert-success_visible" : "mui--z2 alert-success"}

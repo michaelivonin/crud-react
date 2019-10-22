@@ -1,21 +1,32 @@
 import React from "react";
+import "./UserTable.sass";
 
 class UserTable extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
+    this.handleUpdateClick = this.handleUpdateClick.bind(this);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
+  }
+
+  handleUpdateClick(id) {
+    this.props.onUpdateClick(id)
+  }
+
+  handleDeleteClick(id) {
+    this.props.onDeleteClick(id);
   }
 
   render() {
-    const users = this.props.users;
+    const user = this.props.user;
 
     return (
-      <div>
+      <div className="user-table">
         <br/>
         <br/>
-        <div className="mui--text-display1">User table</div>
+        <div className="mui--text-display1 mui--text-center">User table</div>
         <br/>
         <br/>
-        <table className="mui-table">
+        <table className="mui-table mui-table--bordered">
           <thead>
           <tr>
             <th>ID</th>
@@ -24,16 +35,24 @@ class UserTable extends React.Component {
           </tr>
           </thead>
           <tbody>
-          {users.map((user, i) => (
-            <tr key={i}>
+            <tr>
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>
-                <button className="mui-btn mui-btn--small mui-btn--primary mui-btn--fab">&#9998;</button>
-                <button className="mui-btn mui-btn--small mui-btn--danger mui-btn--fab">&#10006;</button>
+                <button
+                  className="mui-btn mui-btn--small mui-btn--primary mui-btn--fab"
+                  onClick={() => this.handleUpdateClick(user.id)}
+                >
+                  &#9998;
+                </button>
+                <button
+                  className="mui-btn mui-btn--small mui-btn--danger mui-btn--fab"
+                  onClick={() => this.handleDeleteClick(user.id)}
+                >
+                  &#10006;
+                </button>
               </td>
             </tr>
-          ))}
           </tbody>
         </table>
       </div>
