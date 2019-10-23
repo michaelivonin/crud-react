@@ -7,7 +7,9 @@ import './App.sass';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.hideMessege = this.hideMessege.bind(this);
+    this.hideMessage = this.hideMessage.bind(this);
+    this.localStorageGetUsers = this.localStorageGetUsers.bind(this);
+    this.localStorageSetUsers = this.localStorageSetUsers.bind(this);
     this.handleStorageOptionClick = this.handleStorageOptionClick.bind(this);
     this.handleButtonCreateClick = this.handleButtonCreateClick.bind(this);
     this.handleUserFormCreateSubmit = this.handleUserFormCreateSubmit.bind(this);
@@ -28,37 +30,35 @@ class App extends React.Component {
     };
   }
 
-  hideMessege() {
+  hideMessage() {
     setTimeout(() => this.setState({
       isSuccessfully: false,
       userIsNotFound: false,
-    }), 3500);
+    }), 3800);
   }
 
   localStorageGetUsers() {
+    this.setState({isLocalStorage: true});
     if (!localStorage.users) localStorage.users = JSON.stringify([]);
-    this.setState({users: JSON.parse(localStorage.users)});
+    return JSON.parse(localStorage.users);
+  }
+
+  localStorageSetUsers(data) {
+    localStorage.users = JSON.stringify(data);
   }
 
   handleStorageOptionClick(target) {
     if (target.tagName !== "BUTTON") return;
 
     const storage = (target.textContent === "Memory") ? [] :
-      (target.textContent === "Local Storage") ? JSON.parse(localStorage.users) : null;
+      (target.textContent === "Local Storage") ? this.localStorageGetUsers() : null;
 
     setTimeout(() => this.setState({
       users: storage,
       isSuccessfully: true,
     }), 200);
 
-    this.hideMessege();
-
-    /*for (let i = 0; i <= 3; i++) {
-      const storage = JSON.parse(this.state.storage);
-      this.setState((prevState) => ({
-        storage: JSON.stringify(JSON.parse(prevState.storage).push(i))
-      }));
-    }*/
+    this.hideMessage();
   }
 
   handleButtonCreateClick(e) {
@@ -72,7 +72,7 @@ class App extends React.Component {
   }
 
   handleUserFormCreateSubmit(target) {
-    const users = this.state.users;
+    const {isLocalStorage, users} = this.state;
 
     users.push({
       id: Date.now().toString(36) + Math.random().toString(36).substr(2),
@@ -80,11 +80,13 @@ class App extends React.Component {
     });
 
     setTimeout(() => this.setState({
+      users: users,
       isCreating: false,
       isSuccessfully: true,
     }), 200);
 
-    this.hideMessege();
+    this.hideMessage();
+    if (isLocalStorage) this.localStorageSetUsers(users);
   }
 
   handleButtonReadClick(e) {
@@ -102,7 +104,7 @@ class App extends React.Component {
 
     if (!user) {
       this.setState({userIsNotFound: true});
-      this.hideMessege();
+      this.hideMessage();
       return;
     }
 
@@ -120,7 +122,7 @@ class App extends React.Component {
   }
 
   handleUserFormUpdateSubmit(target) {
-    const {users, userUpdating} = this.state;
+    const {isLocalStorage, users, userUpdating} = this.state;
 
     if (userUpdating.name === target.name.value) {
       target.name.value = "Type new name";
@@ -135,7 +137,8 @@ class App extends React.Component {
       userUpdating: null,
     }), 200);
 
-    this.hideMessege();
+    this.hideMessage();
+    if (isLocalStorage) this.localStorageSetUsers(users);
   }
 
   handleUserTableDeleteClick(id) {
@@ -149,7 +152,8 @@ class App extends React.Component {
       isSuccessfully: true,
     }), 200);
 
-    this.hideMessege();
+    this.hideMessage();
+    if (this.state.isLocalStorage) this.localStorageSetUsers(users);
   }
 
   render() {
