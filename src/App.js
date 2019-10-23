@@ -17,25 +17,31 @@ class App extends React.Component {
     this.handleUserFormUpdateSubmit = this.handleUserFormUpdateSubmit.bind(this);
     this.handleUserTableDeleteClick = this.handleUserTableDeleteClick.bind(this);
     this.state = {
+      isLocalStorage: false,
       users: null,
       isSuccessfully: false,
       isCreating: false,
       isReading: false,
       userFound: null,
-      userUpdating: false,
+      userIsNotFound: false,
+      userUpdating: null,
     };
   }
 
   hideMessege() {
     setTimeout(() => this.setState({
       isSuccessfully: false,
-    }), 3000);
+      userIsNotFound: false,
+    }), 3500);
+  }
+
+  localStorageGetUsers() {
+    if (!localStorage.users) localStorage.users = JSON.stringify([]);
+    this.setState({users: JSON.parse(localStorage.users)});
   }
 
   handleStorageOptionClick(target) {
     if (target.tagName !== "BUTTON") return;
-
-    if (!localStorage.users) localStorage.users = JSON.stringify([]);
 
     const storage = (target.textContent === "Memory") ? [] :
       (target.textContent === "Local Storage") ? JSON.parse(localStorage.users) : null;
@@ -94,21 +100,42 @@ class App extends React.Component {
   handleUserFormReadSubmit(target) {
     const user = this.state.users.find(user => user.name === target.name.value);
 
+    if (!user) {
+      this.setState({userIsNotFound: true});
+      this.hideMessege();
+      return;
+    }
+
     setTimeout(() => this.setState({
       userFound: user,
       isReading: false,
     }), 200);
   }
 
-  handleUserTableUpdateClick(id) {
-    this.setState({
+  handleUserTableUpdateClick() {
+    setTimeout(() => this.setState({
+      userUpdating: this.state.userFound,
       userFound: null,
-      userUpdating: this.state.users.find(user => user.id === id)
-    });
+    }), 200);
   }
 
-  handleUserFormUpdateSubmit() {
+  handleUserFormUpdateSubmit(target) {
+    const {users, userUpdating} = this.state;
 
+    if (userUpdating.name === target.name.value) {
+      target.name.value = "Type new name";
+      return;
+    }
+
+    users.find(user => user.id === userUpdating.id).name = target.name.value;
+
+    setTimeout(() => this.setState({
+      users: users,
+      isSuccessfully: true,
+      userUpdating: null,
+    }), 200);
+
+    this.hideMessege();
   }
 
   handleUserTableDeleteClick(id) {
@@ -126,7 +153,7 @@ class App extends React.Component {
   }
 
   render() {
-    const {users, isSuccessfully, isCreating, isReading, userFound, userUpdating} = this.state;
+    const {users, isSuccessfully, isCreating, isReading, userFound, userIsNotFound, userUpdating} = this.state;
 
     return (
       <div className="app-wrapper">
@@ -196,9 +223,11 @@ class App extends React.Component {
             />
           }
           <p
-            className={isSuccessfully ? "mui--z2 alert-success alert-success_visible" : "mui--z2 alert-success"}
+            className={isSuccessfully ? "mui--z2 alert alert_success" :
+              userIsNotFound ? "mui--z2 alert alert_failure" : "mui--z2 alert"
+            }
           >
-            Successfully
+            {(isSuccessfully && "Successfully") || (userIsNotFound && "Not found")}
           </p>
         </div>
         <footer className="footer">

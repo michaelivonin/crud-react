@@ -8,8 +8,8 @@ class UserTable extends React.Component {
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
   }
 
-  handleUpdateClick(id) {
-    this.props.onUpdateClick(id)
+  handleUpdateClick() {
+    this.props.onUpdateClick();
   }
 
   handleDeleteClick(id) {
@@ -41,7 +41,7 @@ class UserTable extends React.Component {
               <td>
                 <button
                   className="mui-btn mui-btn--small mui-btn--primary mui-btn--fab"
-                  onClick={() => this.handleUpdateClick(user.id)}
+                  onClick={this.handleUpdateClick}
                 >
                   &#9998;
                 </button>

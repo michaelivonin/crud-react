@@ -31,20 +31,32 @@
   margin-bottom: -100px
   padding-bottom: 100px
 
-.alert-success
-  color: #155724
-  background-color: #d4edda
+.alert
   padding: .75rem 1.25rem
-  border: 1px solid #c3e6cb
   border-radius: .25rem
+  border: 1px solid transparent
   position: absolute
   left: 0
   bottom: 100px
-  transition: transform 0.3s linear
   transform: translate(-100%)
-  &_visible
-    transform: translate(20px)
 
+  &_success
+    color: #155724
+    background-color: #d4edda
+    border-color: #c3e6cb
+    animation: showHideAlert 3s ease
+
+  &_failure
+    color: #721c24
+    background-color: #f8d7da
+    border-color: #f5c6cb
+    animation: showHideAlert 3s ease
+
+  @keyframes showHideAlert
+    0%, 100%
+      transform: translate(-100%)
+    15%, 85%
+      transform: translate(20px)
 
 .footer
   box-sizing: border-box
