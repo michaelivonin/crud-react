@@ -10,7 +10,7 @@ class App extends React.Component {
     this.hideMessage = this.hideMessage.bind(this);
     this.localStorageGetUsers = this.localStorageGetUsers.bind(this);
     this.localStorageSetUsers = this.localStorageSetUsers.bind(this);
-    this.handleStorageOptionClick = this.handleStorageOptionClick.bind(this);
+    this.handleStorageOptionSubmit = this.handleStorageOptionSubmit.bind(this);
     this.handleButtonCreateClick = this.handleButtonCreateClick.bind(this);
     this.handleUserFormCreateSubmit = this.handleUserFormCreateSubmit.bind(this);
     this.handleButtonReadClick = this.handleButtonReadClick.bind(this);
@@ -47,11 +47,12 @@ class App extends React.Component {
     localStorage.users = JSON.stringify(data);
   }
 
-  handleStorageOptionClick(target) {
-    if (target.tagName !== "BUTTON") return;
+  handleStorageOptionSubmit(target) {
+    const select = target.querySelector(".options");
+    const selectedOption = select.options[select.selectedIndex].value;
 
-    const storage = (target.textContent === "Memory") ? [] :
-      (target.textContent === "Local Storage") ? this.localStorageGetUsers() : null;
+    const storage = (selectedOption === "Memory") ? [] :
+      (selectedOption === "Local Storage") ? this.localStorageGetUsers() : null;
 
     setTimeout(() => this.setState({
       users: storage,
@@ -199,7 +200,7 @@ class App extends React.Component {
         <div className="content-wrapper">
           <div className="mui--appbar-height"></div>
           {!users &&
-            <StorageOption onClick={this.handleStorageOptionClick} />
+            <StorageOption onSubmit={this.handleStorageOptionSubmit} />
           }
           {isCreating &&
             <UserForm

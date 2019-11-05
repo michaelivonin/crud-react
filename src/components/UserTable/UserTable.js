@@ -26,7 +26,7 @@ class UserTable extends React.Component {
         <div className="mui--text-display1 mui--text-center">User table</div>
         <br/>
         <br/>
-        <table className="mui-table mui-table--bordered">
+        <table className="mui-table">
           <thead>
           <tr>
             <th>ID</th>

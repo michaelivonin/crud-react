@@ -4,25 +4,32 @@ import "./StorageOption.sass";
 class StorageOption extends React.Component {
   constructor(props) {
     super(props);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleClick(e) {
-    this.props.onClick(e.target);
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.onSubmit(e.target);
   }
 
   render() {
     return (
-      <div className="storage-option mui--text-center">
+      <div className="storage-option">
         <br/>
         <br/>
         <div className="mui--text-display2">Choose storage</div>
         <br/>
         <br/>
-        <div onClick={this.handleClick}>
-          <button className="mui-btn mui-btn--raised storage-option__button">Memory</button>
-          <button className="mui-btn mui-btn--raised storage-option__button">Local Storage</button>
-        </div>
+        <form className="mui-form" onSubmit={this.handleSubmit}>
+          <div className="mui-select">
+            <select className="options">
+              <option>Memory</option>
+              <option>Local Storage</option>
+            </select>
+            <label>Storage</label>
+          </div>
+          <button type="submit" className="mui-btn mui-btn--raised storage-option__button">Confirm</button>
+        </form>
       </div>
     );
   }
